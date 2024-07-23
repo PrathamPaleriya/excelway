@@ -14,6 +14,7 @@ def readExcel(file):
     df = pd.read_excel(file)
     return df
 
+load_dotenv()
 
 groq_api_key = os.getenv('GROQ_API_KEY')
 if not groq_api_key:
