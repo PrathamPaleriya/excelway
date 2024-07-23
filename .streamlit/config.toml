@@ -5,6 +5,3 @@ backgroundColor="#0E1117"
 secondaryBackgroundColor="#262730"
 textColor="#FAFAFA"
 font="sans serif"
-
-[general]
-GROQ_API_KEY = "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"
