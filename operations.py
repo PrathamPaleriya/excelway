@@ -9,18 +9,21 @@ from langchain_core.output_parsers import StrOutputParser
 import logging
 from dotenv import load_dotenv
 
-load_dotenv()
-
 
 def readExcel(file):
     df = pd.read_excel(file)
     return df
 
+
+groq_api_key = os.getenv('GROQ_API_KEY')
+if not groq_api_key:
+    raise ValueError("GROQ_API_KEY is not set in environment variables.")
+
 model = ChatGroq(
-        temperature=0,
-        model="llama3-70b-8192",
-        api_key=os.getenv('GROQ_API_KEY')
-    )
+    temperature=0,
+    model="llama3-70b-8192",
+    groq_api_key=groq_api_key  # Use the correct parameter for API key
+)
 
 intend_template = """Analyze the user question: "{question}" and determine the intent.
 
