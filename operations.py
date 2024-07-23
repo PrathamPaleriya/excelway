@@ -86,7 +86,7 @@ json_analysis_prompt = ChatPromptTemplate.from_template(json_analysis_template)
 
 
 def chat(file, question, language='English', api_key=None):
-
+    model = get_model(api_key)
     intend_chain = intend_prompt | model | StrOutputParser()
     translate_chain = translate_prompt | model | StrOutputParser()
     
@@ -96,7 +96,7 @@ def chat(file, question, language='English', api_key=None):
     except Exception as e:
         return {"error": f"Failed to read file: {str(e)}"}
     
-    model = get_model(api_key)
+    
 
     try:
         intend = intend_chain.invoke({"question": question, "context": df.head(10), "language": language})
@@ -129,7 +129,7 @@ def chat(file, question, language='English', api_key=None):
         return {"error": f"An error occurred: {str(e)}"}
 
 def visualChat(file, question, language ="English",  api_key=None):
-
+    model = get_model(api_key)
     pandas_query_visual_chain = pandas_prompt_visual | model | StrOutputParser()
 
     json_analysis_chain = json_analysis_prompt | model | StrOutputParser()
@@ -142,7 +142,7 @@ def visualChat(file, question, language ="English",  api_key=None):
     except Exception as e:
         return {"error": f"Failed to read file: {str(e)}"}
     
-    model = get_model(api_key)
+    
 
     try:
         intend = intend_chain.invoke({"question": question, "context" : df.head(10), "language": language})
