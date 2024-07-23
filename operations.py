@@ -8,23 +8,22 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import logging
 from dotenv import load_dotenv
+import streamlit as st
 
+
+def get_model(api_key):
+    model = ChatGroq(
+        temperature=0,
+        model="llama3-70b-8192",
+        api_key=api_key
+    )
+
+    return model
 
 def readExcel(file):
     df = pd.read_excel(file)
     return df
 
-load_dotenv()
-
-groq_api_key = os.getenv('GROQ_API_KEY')
-if not groq_api_key:
-    raise ValueError("GROQ_API_KEY is not set in environment variables.")
-
-model = ChatGroq(
-    temperature=0,
-    model="llama3-70b-8192",
-    groq_api_key=groq_api_key  # Use the correct parameter for API key
-)
 
 intend_template = """Analyze the user question: "{question}" and determine the intent.
 
@@ -53,13 +52,11 @@ translate_template = """
 # intent chain 
 intend_prompt = ChatPromptTemplate.from_template(intend_template)
 
-intend_chain = intend_prompt | model | StrOutputParser()
 
 
 # translation chain
 translate_prompt = ChatPromptTemplate.from_template(translate_template)
 
-translate_chain = translate_prompt | model | StrOutputParser()
 
 
 # _________ visual search
@@ -74,7 +71,7 @@ pandas_visualization_template = """
 """
 pandas_prompt_visual = ChatPromptTemplate.from_template(pandas_visualization_template)
 
-pandas_query_visual_chain = pandas_prompt_visual | model | StrOutputParser()
+
 
 
 json_analysis_template = """Analyze the JSON context: {context} and provide a concise insight in {language}.
@@ -85,18 +82,21 @@ Only provide the concise insight and do not include any additional information. 
 """
 
 json_analysis_prompt = ChatPromptTemplate.from_template(json_analysis_template)
-json_analysis_chain = json_analysis_prompt | model | StrOutputParser()
 
 
-def chat(file, question, language='English'):
-    logging.debug(f"Received file: {file}")
-    logging.debug(f"Received question: {question}")
-    logging.debug(f"Requested language: {language}")
+
+def chat(file, question, language='English', api_key=None):
+
+    intend_chain = intend_prompt | model | StrOutputParser()
+    translate_chain = translate_prompt | model | StrOutputParser()
+    
 
     try:
         df = pd.read_excel(file)
     except Exception as e:
         return {"error": f"Failed to read file: {str(e)}"}
+    
+    model = get_model(api_key)
 
     try:
         intend = intend_chain.invoke({"question": question, "context": df.head(10), "language": language})
@@ -128,12 +128,21 @@ def chat(file, question, language='English'):
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}
 
-def visualChat(file, question, language ="English"):
+def visualChat(file, question, language ="English",  api_key=None):
+
+    pandas_query_visual_chain = pandas_prompt_visual | model | StrOutputParser()
+
+    json_analysis_chain = json_analysis_prompt | model | StrOutputParser()
+
+    intend_chain = intend_prompt | model | StrOutputParser()
+    translate_chain = translate_prompt | model | StrOutputParser()
 
     try:
         df = pd.read_excel(file)
     except Exception as e:
         return {"error": f"Failed to read file: {str(e)}"}
+    
+    model = get_model(api_key)
 
     try:
         intend = intend_chain.invoke({"question": question, "context" : df.head(10), "language": language})
@@ -179,7 +188,6 @@ def visualChat(file, question, language ="English"):
 
 
 if __name__ == "__main__":
-
     question = input("Enter you question >> ")
     # print(chat(file = "Historical_data.xlsx", question= question))
     # print(visualChat(file = "Historical_data.xlsx", question=question))

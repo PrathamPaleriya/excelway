@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 from operations import chat, visualChat
 
+groq_api_key = st.secrets["general"]["GROQ_API_KEY"]
+
+
 def display_chat_history(messages):
     for message in messages:
         if message["role"] == "user":
@@ -44,7 +47,7 @@ def chat_page():
         if user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
 
-            response = chat(uploaded_file, user_input, language=selected_language)
+            response = chat(uploaded_file, user_input, language=selected_language, api_key=groq_api_key)
 
             if "error" in response:
                 st.subheader(f"**Bot:** {response['error']}",divider="red")
@@ -70,7 +73,7 @@ def visualize_page():
         if user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
 
-            response = visualChat(uploaded_file, user_input, language=selected_language)
+            response = visualChat(uploaded_file, user_input, language=selected_language, api_key=groq_api_key)
 
             if "error" in response:
                 st.session_state.messages.append({"role": "bot", "content": response["error"]})
