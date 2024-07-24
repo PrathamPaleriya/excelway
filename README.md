@@ -73,4 +73,4 @@ Feel free to open issues or submit pull requests if you have any suggestions or 
 
 ## Contact 📧
 
-For any questions or feedback, please contact [your_email@example.com](mailto:paleriyapratham@gmail.com).
+For any questions or feedback, please contact [paleriyapratham@gmail.com](mailto:paleriyapratham@gmail.com).
